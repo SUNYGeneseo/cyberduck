@@ -69,8 +69,10 @@ public class GraphExceptionMappingService extends AbstractExceptionMappingServic
                 case HttpStatus.SC_TOO_MANY_REQUESTS:
                     // Rate limit
                     if(failure.getRetry() != null) {
+                        log.debug("WARDEN: HTTP 429 response AND retry-after detected, retrying in {} seconds.", failure.getRetry());
                         return new RetriableAccessDeniedException(buffer.toString(), Duration.ofSeconds(failure.getRetry()));
                     }
+                    log.debug("WARDEN: HTTP 429 response but no retry-after detected, retrying in {} seconds.", PreferencesFactory.get().getInteger("connection.retry.delay"));
                     return new RetriableAccessDeniedException(buffer.toString(), Duration.ofSeconds(PreferencesFactory.get().getInteger("connection.retry.delay")));
                 case HttpStatus.SC_BAD_REQUEST:
                     if(StringUtils.equalsIgnoreCase("Must provide one of the following facets to create an item: Bundle, File, Folder, RemoteItem", failure.getErrorMessage())) {

@@ -18,9 +18,11 @@ package ch.cyberduck.core.onedrive.features.sharepoint;
 import ch.cyberduck.core.DefaultIOExceptionMappingService;
 import ch.cyberduck.core.Path;
 import ch.cyberduck.core.exception.BackgroundException;
+import ch.cyberduck.core.onedrive.GraphExceptionMappingService;
 import ch.cyberduck.core.onedrive.SharepointSiteSession;
 import ch.cyberduck.core.onedrive.features.GraphFileIdProvider;
 
+import org.nuxeo.onedrive.client.OneDriveAPIException;
 import org.nuxeo.onedrive.client.types.Site;
 
 import java.io.IOException;
@@ -47,6 +49,10 @@ public class SharepointSiteFileIdProvider extends GraphFileIdProvider {
             final Site.Metadata site;
             try {
                 site = getSite(file);
+            }
+            // warden: attempting to identify where HTTP 429 are not being respected and causing terminal errors
+            catch(OneDriveAPIException exception) {
+                throw new GraphExceptionMappingService(fileid).map("Failure to read attributes of {0}", exception, file);
             }
             catch(IOException exception) {
                 throw new DefaultIOExceptionMappingService().map("Failure to read attributes of {0}", exception, file);

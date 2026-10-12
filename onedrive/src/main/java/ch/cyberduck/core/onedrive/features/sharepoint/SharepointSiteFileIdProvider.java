@@ -52,7 +52,7 @@ public class SharepointSiteFileIdProvider extends GraphFileIdProvider {
             }
             // warden: attempting to identify where HTTP 429 are not being respected and causing terminal errors
             catch(OneDriveAPIException exception) {
-                throw new GraphExceptionMappingService(fileid).map("Failure to read attributes of {0}", exception, file);
+                throw new GraphExceptionMappingService(this).map("Failure to read attributes of {0}", exception, file);
             }
             catch(IOException exception) {
                 throw new DefaultIOExceptionMappingService().map("Failure to read attributes of {0}", exception, file);
